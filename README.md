@@ -23,7 +23,7 @@ To get started with MetroApp, follow these steps:
 
 Clone the Repository:
 
-git clone https://github.com/shaquib82/MetroApp.git
+git clone https://github.com/shaquib82/Metro-App.git
 cd MetroApp
 
 Compile the Java Files:
