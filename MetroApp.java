@@ -3,8 +3,18 @@ import java.io.*;
 public class MetroApp {
 
     public class Vertex{
-        HashMap<String,Integer> adj = new HashMap<>();
+        HashMap<String,Integer> adj;
+
+        public Vertex(){
+            adj = new HashMap<>();
+        }
     }
+
+    public enum Metric {
+        DISTANCE,
+        TIME;
+    }
+
     public HashMap<String, Vertex> vertices = new HashMap<>();
 
     public MetroApp(){
@@ -101,22 +111,19 @@ public class MetroApp {
         System.out.println("\t------------------");
         System.out.println("----------------------------------------------------\n");
 
-        ArrayList<String> keys = new ArrayList<>(vertices.keySet());
 
-
-        for(String ks : keys){
+        for(String ks : vertices.keySet()){
 
             String st = ks + " =>\n";
             Vertex vt = vertices.get(ks);
-            ArrayList<String> neighbours = new ArrayList<>(vt.adj.keySet());
 
-            for (String nb : neighbours){
+            for (String nb : vt.adj.keySet()){
                 st = st + "\t" + nb + "\t";
 
                 if (nb.length()<16) st += "\t";
                 if (nb.length()<8) st += "\t";
 
-                st = st + vt.adj.get(nb) + "\n";
+                st += vt.adj.get(nb) + "\n";
             }
             System.out.println(st);
         }
@@ -258,7 +265,7 @@ public class MetroApp {
     between two given stations. It utilizes a stack for traversal and backtracking and a HashMap to keep
     track of processed stations to avoid revisiting them. */
 
-    public String getMinimumDistance(String src, String dest){
+    public String getMinimumDistanceOrTime(String src, String dest, Metric metric){
 
         int min = Integer.MAX_VALUE;
         String ans = "";
@@ -287,8 +294,15 @@ public class MetroApp {
 
             // if there exists a direct edge b/w removed pair and destination vertex
             if(sp2.name.equals(dest)){
+                int temp;
 
-                int temp = sp2.min_dis;
+                if(metric==Metric.DISTANCE){
+                    temp = sp2.min_dis;
+                }
+                else{
+                    temp= sp2.min_time;
+                }
+
                 if(temp<min){
                     ans= sp2.path;
                     min = temp;
@@ -298,88 +312,29 @@ public class MetroApp {
 
             Vertex vt = vertices.get(sp2.name);
 
-            ArrayList<String> nbrs = new ArrayList<>(vt.adj.keySet());
-
-            for(String nb : nbrs){
+            for(String nb : vt.adj.keySet()){
                 // process only unprocessed neighbours
                 if(!processed.containsKey(nb)){
                    Pair np = new Pair();
                    np.name = nb;
                    np.path = sp2.path+nb+"  ";
                    np.min_dis = sp2.min_dis + vt.adj.get(nb);
-//                   np.min_time = sp2.min_time+ 120 + 40*vt.adj.get(nb);
+                   np.min_time = sp2.min_time+ 120 + 40*vt.adj.get(nb);
                    st.push(np);
                 }
             }
         }
 
-        ans += Integer.toString(min);
+        if(metric==Metric.TIME){
+            Double minutes = Math.ceil((double)min / 60);
+            ans += Double.toString(minutes);
+        }
+        else{
+            ans += Integer.toString(min);
+        }
+
         return ans;
      }
-
-
- /*   This method performs a depth-first traversal of the metro network, finding the shortest time taking
-    between two given stations. */
-
-     public String getMinimumTime(String src, String dest){
-
-        int min = Integer.MAX_VALUE;
-        String ans = "";
-        HashMap<String,Boolean> processed = new HashMap<>();
-        Stack<Pair> st = new Stack<>();
-
-        // create a new Pair
-
-         Pair sp = new Pair();
-         sp.name = src;
-         sp.path = src +"  ";
-         sp.min_dis = 0;
-         sp.min_time = 0;
-
-         st.push(sp);
-
-         while(!st.isEmpty()){
-
-             Pair sp2 = st.pop();
-             if(processed.containsKey(sp2.name)) continue;
-             processed.put(sp2.name,true);
-
-             //if there exists a direct edge b/w removed pair and destination vertex
-
-             if(sp2.name.equals(dest)){
-                 int temp = sp2.min_time;
-                 if(temp<min){
-                     ans= sp2.path;
-                     min = temp;
-                 }
-                 continue;
-             }
-
-             Vertex vt = vertices.get(sp2.name);
-             ArrayList<String> nbrs = new ArrayList<>(vt.adj.keySet());
-
-             for(String nb : nbrs){
-
-                 if(!processed.containsKey(nb)){
-                     Pair np = new Pair();
-                     np.name = nb;
-                     np.path = sp2.path+nb+"  ";
-                     //np.min_dis = sp2.min_dis + vt.adj.get(nb);
-                     np.min_time = sp2.min_time + 120 + 40*vt.adj.get(nb);
-                     st.push(np);
-                 }}
-         }
-         Double minutes = Math.ceil((double)min / 60);
-         ans = ans + Double.toString(minutes);
-         return ans;
-     }
-
-     /*
-     The getInterchanges method is designed to parse a route and identify points where passengers
-      need to change lines. It does this by examining the line codes of consecutive stations and
-      determining if a change occurs. When such a change is detected, it annotates the route
-      appropriately and increments a count of interchanges.
-      */
 
      public ArrayList<String> getInterchanges(String str){
 
@@ -534,11 +489,12 @@ public class MetroApp {
         int choice = MetroDriver.getUserChoice(input);
             System.out.print("\n***********************************************************\n");
 
-            if (choice == 7) {
+            if (choice == 6) {
                 System.exit(0);
             }
             MetroDriver.processChoice(choice,input);
-
         }
     }
+
+
 }
