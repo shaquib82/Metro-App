@@ -45,8 +45,7 @@ The main menu provides various options to interact with the metro map:
 - Show the metro map
 - Get the shortest distance between stations
 - Get the shortest time to reach between stations
-- Get the shortest path (distance-wise)
-- Get the shortest path (time-wise)
+- Get the shortest path (distance & time-wise)
 - Exit the application
 
 Example Commands:
